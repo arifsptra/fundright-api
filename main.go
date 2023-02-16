@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"website-fundright/handler"
 	"website-fundright/user"
 
 	"github.com/gin-gonic/gin"
@@ -12,46 +11,30 @@ import (
 )
 
 func main() {
-	// koneksi database
+	// connect to database
 	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
 	dsn := "root:@tcp(127.0.0.1:3306)/db_website_fundright?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
-	// cek error
+	// error handling
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println("Connected to database is successful")
 
-	// ambil nilai dari database
-	var users []user.User
-	db.Find(&users)
+	userRepository := user.NewRepository(db)
 
-	// cetak nilai nama dari database
-	for _, user := range users {
-		fmt.Println(user.Name)
-	}
+	userService := user.NewService(userRepository)
 
+	userHandler := handler.NewUserHandler(userService)
+	
 	router := gin.Default()
-	router.GET("/handler", handler)
+	api := router.Group("/api/v1")
+	api.POST("/users", userHandler.RegisterUser)
 	router.Run()
 }
 
-func handler(c *gin.Context) {
-	// koneksi database
-	// refer https://github.com/go-sql-driver/mysql#dsn-data-source-name for details
-	dsn := "root:@tcp(127.0.0.1:3306)/db_website_fundright?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-	// cek error
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	fmt.Println("Connected to database is successful")
-
-	// ambil nilai dari database
-	var users []user.User
-	db.Find(&users)
-
-	c.JSON(http.StatusOK, users)
-}
+// input dari user
+// handler, mapping input dari user -> struct input
+// service, mapping dari struct input ke struct User
+// repository
+// db
