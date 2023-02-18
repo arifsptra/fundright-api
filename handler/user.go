@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"website-fundright/helper"
 	"website-fundright/user"
@@ -133,5 +134,53 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	respons := helper.APIResponse(metaMessage, http.StatusOK, "success", data)
 	
 	// sending json data
+	c.JSON(http.StatusOK, respons)
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	// 
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		// formatter error output
+		errorMessage := gin.H{"is_uploaded": false}
+		// response error output
+		respons := helper.APIResponse("Avatar Failed to Upload!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+
+	// for now user id is static value. later will use JWT
+	userID := 1
+
+	// path file name
+	// path := "images/" + file.Filename
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+	
+	// save file
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		// formatter error output
+		errorMessage := gin.H{"is_uploaded": false}
+		// response error output
+		respons := helper.APIResponse("Avatar Failed to Upload!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+
+	// save avatar
+	_, err = h.userService.SaveAvatar(userID, path)
+	if err != nil {
+		// formatter error output
+		errorMessage := gin.H{"is_uploaded": false}
+		// response error output
+		respons := helper.APIResponse("Avatar Failed to Upload!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+	
+	// formatter error output
+	errorMessage := gin.H{"is_uploaded": true}
+	// response error output
+	respons := helper.APIResponse("Avatar Success to Upload!", http.StatusOK, "success", errorMessage)
 	c.JSON(http.StatusOK, respons)
 }

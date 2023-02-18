@@ -25,6 +25,8 @@ func main() {
 
 	userService := user.NewService(userRepository)
 
+	userService.SaveAvatar(4, "images/ft.png")
+
 	userHandler := handler.NewUserHandler(userService)
 	
 	router := gin.Default()
@@ -40,6 +42,9 @@ func main() {
 
 	// api endpoint for email checker
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
+
+	// api endpoint for upload avatar
+	api.POST("/avatars", userHandler.UploadAvatar)
 
 	router.Run()
 }
