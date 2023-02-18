@@ -28,10 +28,18 @@ func main() {
 	userHandler := handler.NewUserHandler(userService)
 	
 	router := gin.Default()
+
+	// api version
 	api := router.Group("/api/v1")
 
+	// api endpoint for register
 	api.POST("/users", userHandler.RegisterUser)
+	
+	// api endpoint for login
 	api.POST("/sessions", userHandler.Login)
+
+	// api endpoint for email checker
+	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 
 	router.Run()
 }
