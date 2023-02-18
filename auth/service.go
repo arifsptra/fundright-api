@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"os"
 
 	"github.com/dgrijalva/jwt-go"
@@ -8,6 +9,7 @@ import (
 
 type Service interface {
 	GenerateToken(userID int) (string, error)
+	ValidateToken(encodeToken string) (*jwt.Token, error)
 }
 
 type jwtService struct{}
@@ -38,4 +40,30 @@ func (s *jwtService) GenerateToken(userID int) (string, error) {
 	}
 
 	return signedToken, nil
+}
+
+// function to validate token with jwt
+func (s *jwtService) ValidateToken(encodeToken string) (*jwt.Token, error) {
+	// check token validity
+	token, err := jwt.Parse(encodeToken, func(token *jwt.Token) (interface{}, error) {
+		// checks if the method used to generate the token signature is the HMAC method
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, errors.New("invalid token")
+		}
+		return []byte(jwtSecretKey), nil
+	})
+
+	// if an error occurs in the token validation process
+	if err != nil {
+		return token, err
+	}
+
+	// if token not valid
+	if !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+
+	// if token valid
+	return token, nil
 }
