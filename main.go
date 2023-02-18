@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"website-fundright/auth"
 	"website-fundright/handler"
 	"website-fundright/user"
 
@@ -25,9 +26,9 @@ func main() {
 
 	userService := user.NewService(userRepository)
 
-	userService.SaveAvatar(4, "images/ft.png")
+	authService := auth.NewService()
 
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 	
 	router := gin.Default()
 

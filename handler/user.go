@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"website-fundright/auth"
 	"website-fundright/helper"
 	"website-fundright/user"
 
@@ -12,11 +13,12 @@ import (
 // this handler has the goal of mapping input from the user to the struct
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
 // pass this struct as a service parameter
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 // function register user
@@ -46,8 +48,18 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	// call jwt service
+	token, err := h.authService.GenerateToken(newUser.ID)
+	// error handling
+	if err != nil {
+		// response error output
+		respons := helper.APIResponse("Register Account is Failed!", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+
 	// call function format user and save data to formatter
-	formatter := user.FormatUser(newUser, "tokennnn")
+	formatter := user.FormatUser(newUser, token)
 
 	// response success and send formatter data
 	response := helper.APIResponse("Register Account is Success!", http.StatusOK, "success", formatter)
@@ -83,8 +95,18 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// call jwt service
+	token, err := h.authService.GenerateToken(loggedinUser.ID)
+	// error handling
+	if err != nil {
+		// response error output
+		respons := helper.APIResponse("Login Failed!", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+
 	// call function format user and save data to formatter
-	formatter := user.FormatUser(loggedinUser, "tokennnn")
+	formatter := user.FormatUser(loggedinUser, token)
 
 	// response success and send formatter data
 	response := helper.APIResponse("Login Success!", http.StatusOK, "success", formatter)
