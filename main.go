@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"website-fundright/auth"
+	"website-fundright/campaign"
 	"website-fundright/handler"
 	"website-fundright/helper"
 	"website-fundright/user"
@@ -27,6 +29,22 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+
+	campaignRepository := campaign.NewRepository(db)
+
+	// test campaign
+	// campaigns, err := campaignRepository.FindAll()
+	campaigns, err := campaignRepository.FindByID(1)
+
+	fmt.Println("This is campaigns")	
+	fmt.Println(len(campaigns))
+
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+	}
 
 	userService := user.NewService(userRepository)
 
