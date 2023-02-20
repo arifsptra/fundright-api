@@ -171,8 +171,9 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
+	currentUser := c.MustGet("currentUser").(user.User)
 	// for now user id is static value. later will use JWT
-	userID := 1
+	userID := currentUser.ID
 
 	// path file name
 	// path := "images/" + file.Filename

@@ -2,10 +2,14 @@ package main
 
 import (
 	"log"
+	"net/http"
+	"strings"
 	"website-fundright/auth"
 	"website-fundright/handler"
+	"website-fundright/helper"
 	"website-fundright/user"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -45,7 +49,71 @@ func main() {
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 
 	// api endpoint for upload avatar
-	api.POST("/avatars", userHandler.UploadAvatar)
+	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	router.Run()
+}
+
+// function authentication middleware
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+	return func (c *gin.Context) {
+		// get context header "Authorization"
+		authHeader := c.GetHeader("Authorization")
+		// if first word in authHeader is not "Bearer"
+		if !strings.Contains(authHeader, "Bearer") {
+			// response error output
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			// abort program with status json
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+	
+		// get token
+		// declare token string
+		tokenString := ""
+		// default token format "Bearer thisistoken"
+		tokenArray := strings.Split(authHeader, " ")
+		// for this i get only token
+		if len(tokenArray) == 2 {
+			// initialize token string
+			tokenString = tokenArray[1]
+		}
+
+		// validate token 
+		token, err := authService.ValidateToken(tokenString)
+		// error handling
+		if err != nil {
+			// response error output
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			// abort program with status json
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		// get payload with jwt
+		payload, ok := token.Claims.(jwt.MapClaims)
+		// error handling
+		if !ok || !token.Valid {
+			// response error output
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			// abort program with status json
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		// get user id
+		userID := int(payload["user_id"].(float64))
+
+		// get user by id
+		user, err := userService.GetUserByID(userID)
+		if err != nil {
+			// response error output
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			// abort program with status json
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+		// set context value is user
+		c.Set("currentUser", user)
+	}
 }
