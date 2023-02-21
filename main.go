@@ -34,17 +34,22 @@ func main() {
 
 	// test campaign
 	// campaigns, err := campaignRepository.FindAll()
-	campaigns, err := campaignRepository.FindByID(1)
+	// campaigns, err := campaignRepository.FindByID(1)
 
-	fmt.Println("This is campaigns")	
+	// fmt.Println("This is campaigns")	
+	// fmt.Println(len(campaigns))
+
+	// for _, campaign := range campaigns {
+	// 	fmt.Println(campaign.Name)
+	// 	if len(campaign.CampaignImages) > 0 {
+	// 		fmt.Println(campaign.CampaignImages[0].FileName)
+	// 	}
+	// }
+	
+	campaignService := campaign.NewService(campaignRepository)
+
+	campaigns, _ := campaignService.GetCampaign(1)
 	fmt.Println(len(campaigns))
-
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		if len(campaign.CampaignImages) > 0 {
-			fmt.Println(campaign.CampaignImages[0].FileName)
-		}
-	}
 
 	userService := user.NewService(userRepository)
 
