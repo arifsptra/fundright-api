@@ -43,6 +43,10 @@ func main() {
 	
 	router := gin.Default()
 
+	// route for image directories
+	router.Static("/images/avatars", "./images/avatars")
+	router.Static("/images/campaigns", "./images/campaigns")
+
 	// api version
 	api := router.Group("/api/v1")
 

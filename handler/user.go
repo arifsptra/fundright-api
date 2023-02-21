@@ -177,7 +177,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 
 	// path file name
 	// path := "images/" + file.Filename
-	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+	path := fmt.Sprintf("images/avatars/%d-%s", userID, file.Filename)
 	
 	// save file
 	err = c.SaveUploadedFile(file, path)
