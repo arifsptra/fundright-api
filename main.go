@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -32,30 +31,15 @@ func main() {
 
 	campaignRepository := campaign.NewRepository(db)
 
-	// test campaign
-	// campaigns, err := campaignRepository.FindAll()
-	// campaigns, err := campaignRepository.FindByID(1)
-
-	// fmt.Println("This is campaigns")	
-	// fmt.Println(len(campaigns))
-
-	// for _, campaign := range campaigns {
-	// 	fmt.Println(campaign.Name)
-	// 	if len(campaign.CampaignImages) > 0 {
-	// 		fmt.Println(campaign.CampaignImages[0].FileName)
-	// 	}
-	// }
-	
-	campaignService := campaign.NewService(campaignRepository)
-
-	campaigns, _ := campaignService.GetCampaign(1)
-	fmt.Println(len(campaigns))
-
 	userService := user.NewService(userRepository)
+
+	campaignService := campaign.NewService(campaignRepository)
 
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
+
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 	
 	router := gin.Default()
 
@@ -73,6 +57,9 @@ func main() {
 
 	// api endpoint for upload avatar
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	// api endpoint for get campaigns
+	api.GET("/campaigns", campaignHandler.GetCampaign)
 
 	router.Run()
 }
