@@ -137,9 +137,13 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 		errorMessage := gin.H{"error": errors}
 		// response error output
 		respons := helper.APIResponse("Update Campaign is Failed!", http.StatusBadRequest, "error", errorMessage)
-		c.JSON(http.StatusUnprocessableEntity, respons)
+		c.JSON(http.StatusBadRequest, respons)
 		return
 	}
+
+	// get current user
+	currentUser := c.MustGet("currentUser").(user.User)
+	inputData.User = currentUser
 
 	// call function update data from service
 	updateCampaign, err := h.campaignService.UpdateCampaign(inputID, inputData)
@@ -147,7 +151,7 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 	if err != nil {
 		// response error output
 		respons := helper.APIResponse("Update Campaign is Failed!", http.StatusBadRequest, "error", nil)
-		c.JSON(http.StatusUnprocessableEntity, respons)
+		c.JSON(http.StatusBadRequest, respons)
 		return
 	}
 
