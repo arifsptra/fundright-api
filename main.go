@@ -63,7 +63,10 @@ func main() {
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	// api endpoint for get campaigns
-	api.GET("/campaigns", campaignHandler.GetCampaign)
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
+
+	// api endpoint for get campaign by campaign id
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 
 	router.Run()
 }

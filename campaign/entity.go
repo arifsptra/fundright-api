@@ -1,6 +1,10 @@
 package campaign
 
-import "time"
+import (
+	// "os/user"
+	"time"
+	"website-fundright/user"
+)
 
 // struct for Campaign data
 type Campaign struct {
@@ -17,6 +21,7 @@ type Campaign struct {
 	UpdatedAt time.Time
 	UserID int
 	CampaignImages []CampaignImage
+	User user.User
 }
 
 // struct for Campaign Image data
