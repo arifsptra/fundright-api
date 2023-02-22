@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"website-fundright/campaign"
 	"website-fundright/helper"
+	"website-fundright/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -66,6 +67,39 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 
 	// response success
 	response := helper.APIResponse("Get Campaign is Success!", http.StatusOK, "success", campaign.FormatCampaignDetail(campaignDetail))
+
+	// sending json data
+	c.JSON(http.StatusOK, response)
+}
+
+// function to create new campaign
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		// call function FormatValidationError from helper
+		errors := helper.FormatValidationError(err)
+		// formatter error output
+		errorMessage := gin.H{"error": errors}
+		// response error output
+		respons := helper.APIResponse("Create Campaign is Failed!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, respons)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.campaignService.CreateCampaign(input)
+	if err != nil {
+		// response error output
+		respons := helper.APIResponse("Create Campaign is Failed!", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, respons)
+		return
+	}
+
+	// response success
+	response := helper.APIResponse("Create Campaign is Success!", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
 
 	// sending json data
 	c.JSON(http.StatusOK, response)

@@ -11,7 +11,7 @@ type Campaign struct {
 	ID int
 	Name string
 	ShortDescription string
-	Desciption string
+	Description string
 	GoalAmount int
 	CurrentAmount int
 	Perks string
