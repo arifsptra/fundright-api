@@ -74,8 +74,11 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 
 // function to create new campaign
 func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	// declare input variable
 	var input campaign.CreateCampaignInput
+	// initialize input data variable with json
 	err := c.ShouldBindJSON(&input)
+	// error handling
 	if err != nil {
 		// call function FormatValidationError from helper
 		errors := helper.FormatValidationError(err)
@@ -87,10 +90,13 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 		return
 	}
 
+	// get current user
 	currentUser := c.MustGet("currentUser").(user.User)
 	input.User = currentUser
 
+	// call function create campaign from service
 	newCampaign, err := h.campaignService.CreateCampaign(input)
+	// error handling
 	if err != nil {
 		// response error output
 		respons := helper.APIResponse("Create Campaign is Failed!", http.StatusBadRequest, "error", nil)
@@ -100,6 +106,53 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 
 	// response success
 	response := helper.APIResponse("Create Campaign is Success!", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
+
+	// sending json data
+	c.JSON(http.StatusOK, response)
+}
+
+// function to update campaign
+func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
+	// declare input id variable
+	var inputID campaign.GetCampaignDetailInput
+	// initialize input id variable
+	err := c.ShouldBindUri(&inputID)
+	// error handling
+	if err != nil {
+		// response error output
+		respons := helper.APIResponse("Update Campaign is Failed!", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, respons)
+		return
+	}
+
+	// declare input data variable
+	var inputData campaign.CreateCampaignInput
+	// initialize input data variable with json
+	err = c.ShouldBindJSON(&inputData)
+	// error handling
+	if err != nil {
+		// call function FormatValidationError from helper
+		errors := helper.FormatValidationError(err)
+		// formatter error output
+		errorMessage := gin.H{"error": errors}
+		// response error output
+		respons := helper.APIResponse("Update Campaign is Failed!", http.StatusBadRequest, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, respons)
+		return
+	}
+
+	// call function update data from service
+	updateCampaign, err := h.campaignService.UpdateCampaign(inputID, inputData)
+	// error handling
+	if err != nil {
+		// response error output
+		respons := helper.APIResponse("Update Campaign is Failed!", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, respons)
+		return
+	}
+
+	// response success and send formatter data
+	response := helper.APIResponse("Update Campaign is Success!", http.StatusOK, "success", campaign.FormatCampaign(updateCampaign))
 
 	// sending json data
 	c.JSON(http.StatusOK, response)

@@ -8,6 +8,7 @@ import (
 
 type Service interface {
 	CreateCampaign(input CreateCampaignInput) (Campaign, error)
+	UpdateCampaign(inputID GetCampaignDetailInput, inputData CreateCampaignInput) (Campaign, error)
 	GetCampaigns(userID int) ([]Campaign, error)
 	GetCampaignByID(input GetCampaignDetailInput) (Campaign, error)
 }
@@ -62,6 +63,26 @@ func (s *service) CreateCampaign(input CreateCampaignInput) (Campaign, error) {
 	campaign.Slug = slug.Make(stringSlug)
 
 	newCampaign, err := s.repository.Save(campaign)
+	if err != nil {
+		return newCampaign, err
+	}
+	return newCampaign, nil
+}
+
+// function to update campaign
+func (s *service) UpdateCampaign(inputID GetCampaignDetailInput, inputData CreateCampaignInput) (Campaign, error) {
+	campaign, err := s.repository.FindByCampaignID(inputID.CampaignID)
+	if err != nil {
+		return campaign, err
+	}
+
+	campaign.Name = inputData.Name
+	campaign.ShortDescription = inputData.ShortDescription
+	campaign.Description = inputData.Description
+	campaign.GoalAmount = inputData.GoalAmount
+	campaign.Perks = inputData.Perks
+
+	newCampaign, err := s.repository.Update(campaign)
 	if err != nil {
 		return newCampaign, err
 	}

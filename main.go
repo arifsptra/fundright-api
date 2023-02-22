@@ -71,6 +71,9 @@ func main() {
 	// api endpoint for create new campaign
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 
+	// api endpoint for update campaign
+	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
+
 	router.Run()
 }
 
