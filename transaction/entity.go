@@ -1,6 +1,9 @@
 package transaction
 
-import "time"
+import (
+	"website-fundright/user"
+	"time"
+)
 
 type Transaction struct {
 	ID         int
@@ -11,4 +14,5 @@ type Transaction struct {
 	UpdatedAt  time.Time
 	UserID     int
 	CampaignID int
+	User user.User
 }

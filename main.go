@@ -8,6 +8,7 @@ import (
 	"website-fundright/campaign"
 	"website-fundright/handler"
 	"website-fundright/helper"
+	"website-fundright/transaction"
 	"website-fundright/user"
 
 	"github.com/dgrijalva/jwt-go"
@@ -31,15 +32,21 @@ func main() {
 
 	campaignRepository := campaign.NewRepository(db)
 
+	transactionRepository := transaction.NewRepository(db)
+
 	userService := user.NewService(userRepository)
 
 	campaignService := campaign.NewService(campaignRepository)
+
+	transactionService := transaction.NewService(transactionRepository)
 
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 	
 	router := gin.Default()
 
@@ -76,6 +83,9 @@ func main() {
 
 	// api endpoint for post campaign image
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
+
+	// api endpoint for get transaction campaign
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
 
 	router.Run()
 }
