@@ -195,6 +195,7 @@ func (h *campaignHandler) UploadImage(c *gin.Context) {
 
 	// get current user
 	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
 	userID := currentUser.ID
 
 	// path file name
