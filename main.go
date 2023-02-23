@@ -74,6 +74,9 @@ func main() {
 	// api endpoint for update campaign
 	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 
+	// api endpoint for post campaign image
+	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
+
 	router.Run()
 }
 
