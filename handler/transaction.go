@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"website-fundright/helper"
 	"website-fundright/transaction"
+	"website-fundright/user"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,6 +31,10 @@ func (h *transactionHandler) GetCampaignTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, respons)
 		return
 	}
+
+	// get current user
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
 
 	// call function to get campaign transaction by campaign id in service
 	transactions, err := h.service.GetTransactionByCampaignID(input)
