@@ -68,6 +68,6 @@ func (h *transactionHandler) GetUserTransaction(c *gin.Context) {
 	}
 
 	// response error output
-	respons := helper.APIResponse("User Transaction Success to Get!", http.StatusOK, "success", transactions)
+	respons := helper.APIResponse("User Transaction Success to Get!", http.StatusOK, "success", transaction.FormatUserTransactions(transactions))
 	c.JSON(http.StatusOK, respons)
 }
