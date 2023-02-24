@@ -1,8 +1,9 @@
 package transaction
 
 import (
-	"website-fundright/user"
 	"time"
+	"website-fundright/campaign"
+	"website-fundright/user"
 )
 
 type Transaction struct {
@@ -15,4 +16,5 @@ type Transaction struct {
 	UserID     int
 	CampaignID int
 	User user.User
+	Campaign campaign.Campaign
 }
