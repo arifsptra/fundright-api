@@ -8,6 +8,7 @@ import (
 	"website-fundright/campaign"
 	"website-fundright/handler"
 	"website-fundright/helper"
+	"website-fundright/payment"
 	"website-fundright/transaction"
 	"website-fundright/user"
 
@@ -38,7 +39,9 @@ func main() {
 
 	campaignService := campaign.NewService(campaignRepository)
 
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
+
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	authService := auth.NewService()
 

@@ -3,6 +3,7 @@ package transaction
 import (
 	"errors"
 	"website-fundright/campaign"
+	"website-fundright/payment"
 )
 
 type Service interface {
@@ -14,10 +15,11 @@ type Service interface {
 type service struct {
 	repository Repository
 	campaignRepository campaign.Repository
+	paymentService payment.Service
 }
 
-func NewService(repository Repository, campaignRepository campaign.Repository) *service {
-	return &service{repository, campaignRepository}
+func NewService(repository Repository, campaignRepository campaign.Repository, paymentService payment.Service) *service {
+	return &service{repository, campaignRepository, paymentService}
 }
 
 func (s *service) GetTransactionByCampaignID(input CampaignTransaction) ([]Transaction, error) {
@@ -57,5 +59,22 @@ func (s *service) CreateTransaction(input CreateTransaction) (Transaction, error
 	if err != nil {
 		return newTransaction, err
 	}
+
+	paymentTransaction := payment.Transaction{
+		ID: newTransaction.ID,
+		Amount: newTransaction.Amount,
+	}
+
+	paymentURL, err := s.paymentService.GetPaymentURL(paymentTransaction, input.User)
+	if err != nil {
+		return newTransaction, err
+	}
+
+	newTransaction.PaymentURL = paymentURL
+	newTransaction, err = s.repository.Update(newTransaction)
+	if err != nil {
+		return newTransaction, err
+	}
+
 	return newTransaction, nil
 }

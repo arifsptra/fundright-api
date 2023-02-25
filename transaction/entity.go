@@ -11,6 +11,7 @@ type Transaction struct {
 	Amount     int
 	Status     string
 	Code       string
+	PaymentURL string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	UserID     int
