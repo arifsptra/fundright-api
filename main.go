@@ -90,6 +90,9 @@ func main() {
 	// api endpoint for get user transaction
 	api.GET("/transactions", authMiddleware(authService, userService), transactionHandler.GetUserTransaction)
 
+	// api endpoint for create transaction
+	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
+
 	router.Run()
 }
 
