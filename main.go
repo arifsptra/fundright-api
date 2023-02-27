@@ -96,6 +96,9 @@ func main() {
 	// api endpoint for create transaction
 	api.POST("/transactions", authMiddleware(authService, userService), transactionHandler.CreateTransaction)
 
+	// api endpoint for create transaction notification
+	api.POST("/transactions/notification", transactionHandler.GetNotification)
+
 	router.Run()
 }
 
