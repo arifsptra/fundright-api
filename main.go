@@ -76,6 +76,9 @@ func main() {
 	// api endpoint for upload avatar
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
+	// api endpoint for fetch user
+	api.POST("/users/fetch", authMiddleware(authService, userService), userHandler.FetchUser)
+
 	// api endpoint for get campaigns
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 
